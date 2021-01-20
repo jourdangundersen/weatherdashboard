@@ -23,6 +23,10 @@ function getCurrentForcast (cityName){
 
 
         `)
+        var lat = apiData.coord.lat;
+        var lon = apiData.coord.lon;
+        console.log(lat, lon);
+        uvIndex(lat, lon)
     })
 }
 function fiveDayForecast (cityName){
@@ -39,7 +43,7 @@ function fiveDayForecast (cityName){
         for (let i =0;i<apiData.length;i=i+8){
              htmlString += `
                 <div class="card">
-                <h3>City: ${cityName}</h3>
+                <p>Date: ${apiData[i].dt_txt}</p>
                 <h6>Temp: ${apiData[i].main.temp}<span><img src="http://openweathermap.org/img/wn/${apiData[i].weather[0].icon}@2x.png" /><span></h6>
                 <p>Wind Speed: ${apiData[i].wind.speed}</p>
                 <p>Humidity: ${apiData[i].main.humidity}</p>
@@ -58,4 +62,18 @@ function fiveDayForecast (cityName){
 
         // `)
     })
+}
+function uvIndex (lat, lon){
+    // http://api.openweathermap.org/data/2.5/uvi?lat={lat}&lon={lon}&appid={API key}
+    // http://api.openweathermap.org/data/2.5/uvi?lat={lat}&lon={lon}&appid={API key}
+    $.ajax({
+        url:`https://api.openweathermap.org/data/2.5/uvi?lat=${lat}&lon=${lon}&appid=29e66bd203ea7e7fb543299155a97662`,
+        method:"GET"
+
+    })
+    .then(function(apiData){
+        console.log(apiData);
+        $("#uvIndex").text("UV Index:" + apiData.value);
+    })
+
 }
