@@ -1,16 +1,19 @@
-console.log("JS file loaded")
-$("#searchButton").on("click", function(event){
+$(document).ready(function() {
+    displayLastSearched();
+console.log("JS file loaded");
+$(document).on("click", "#searchButton", function(event){
     event.preventDefault();
     var cityName = $("#cityName").val();
-    console.log(cityName,"City name entered");
+    console.log(cityName,"city name entered");
     getCurrentForcast(cityName);
     fiveDayForecast(cityName);
+    localStorage.setItem("lastSearched", JSON.stringify(cityName));
 });
 function getCurrentForcast (cityName){
     $.ajax({
         url:`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=29e66bd203ea7e7fb543299155a97662&units=imperial`,
         method:"GET"
-
+        
     })
     .then(function(apiData){
         console.log(apiData);
@@ -22,12 +25,12 @@ function getCurrentForcast (cityName){
         <p>Humidity: ${apiData.main.humidity}</p>
 
 
-        `)
+        `);
         var lat = apiData.coord.lat;
         var lon = apiData.coord.lon;
         console.log(lat, lon);
-        uvIndex(lat, lon)
-    })
+        uvIndex(lat, lon);
+    });
 }
 function fiveDayForecast (cityName){
     $.ajax({
@@ -37,9 +40,9 @@ function fiveDayForecast (cityName){
     })
     .then(function(apiData){
         console.log(apiData);
-        apiData = apiData.list
-        console.log(apiData)
-        var htmlString = ""
+        apiData = apiData.list;
+        console.log(apiData);
+        var htmlString = "";
         for (let i =0;i<apiData.length;i=i+8){
              htmlString += `
                 <div class="card">
@@ -48,7 +51,7 @@ function fiveDayForecast (cityName){
                 <p>Wind Speed: ${apiData[i].wind.speed}</p>
                 <p>Humidity: ${apiData[i].main.humidity}</p>
                 </div>
-             `
+             `;
 
         }
         $("#fiveDayForecast").html(htmlString);
@@ -61,7 +64,7 @@ function fiveDayForecast (cityName){
 
 
         // `)
-    })
+    });
 }
 function uvIndex (lat, lon){
     // http://api.openweathermap.org/data/2.5/uvi?lat={lat}&lon={lon}&appid={API key}
@@ -74,6 +77,13 @@ function uvIndex (lat, lon){
     .then(function(apiData){
         console.log(apiData);
         $("#uvIndex").text("UV Index:" + apiData.value);
-    })
+    });
 
 }
+function displayLastSearched (){
+    var lastSearchedCity = JSON.parse(localStorage.getItem("lastSearched"));
+    var data = "";
+    getCurrentForcast(lastSearchedCity);
+    fiveDayForecast(lastSearchedCity);
+}
+});
